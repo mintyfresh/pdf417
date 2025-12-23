@@ -6,6 +6,7 @@ static VALUE rb_pdf417_lib_codewords(VALUE self);
 static VALUE rb_pdf417_lib_to_blob(VALUE self);
 static VALUE rb_pdf417_lib_new(VALUE class, VALUE text);
 static void rb_pdf417_lib_cleanup(void *p);
+static VALUE rb_pdf417_lib_alloc(VALUE class);
 static VALUE rb_pdf417_lib_init(VALUE self, VALUE text);
 static VALUE rb_pdf417_lib_bitColumns(VALUE self);
 static VALUE rb_pdf417_lib_lenBits(VALUE self);

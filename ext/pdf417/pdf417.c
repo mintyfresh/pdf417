@@ -30,6 +30,7 @@
 void Init_pdf417() {
   rb_cPdf417 = rb_define_class("PDF417", rb_cObject); // Our PDF417 object    
   rb_cPdf417_Lib = rb_define_class_under(rb_cPdf417, "Lib", rb_cObject); // Our PDF417::Lib object, to represent the C file
+  rb_define_alloc_func(rb_cPdf417_Lib, rb_pdf417_lib_alloc);
   rb_define_singleton_method(rb_cPdf417_Lib, "encode_text", rb_pdf417_lib_encode_text, 1);
   rb_define_singleton_method(rb_cPdf417_Lib, "new", rb_pdf417_lib_new, 1);
   rb_define_method(rb_cPdf417_Lib, "initialize", rb_pdf417_lib_init, 1);
@@ -89,6 +90,15 @@ static void rb_pdf417_lib_cleanup(void *p) {
 }
 
 /* :nodoc: */
+static VALUE rb_pdf417_lib_alloc(VALUE class) {
+  pdf417param *ptr;
+  VALUE tdata = Data_Make_Struct(class, pdf417param, 0, rb_pdf417_lib_cleanup, ptr);
+  pdf417init(ptr);
+  rb_iv_set(tdata, "@generation_options", INT2NUM(ptr->options));
+  return tdata;
+}
+
+/* :nodoc: */
 static VALUE rb_pdf417_lib_init(VALUE self, VALUE text) {
   rb_iv_set(self, "@text", text);
   return self;
@@ -102,13 +112,8 @@ static VALUE rb_pdf417_lib_init(VALUE self, VALUE text) {
  */
 static VALUE rb_pdf417_lib_new(VALUE class, VALUE text) {
   VALUE argv[1];
-  pdf417param *ptr;
-  VALUE tdata = Data_Make_Struct(class, pdf417param, 0, rb_pdf417_lib_cleanup, ptr);
-  pdf417init(ptr);
-  rb_iv_set(tdata, "@generation_options", INT2NUM(ptr->options));
   argv[0] = text;
-  rb_obj_call_init(tdata, 1, argv);
-  return tdata;
+  return rb_class_new_instance(1, argv, class);
 }
 
 /*
